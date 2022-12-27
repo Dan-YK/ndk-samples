@@ -50,10 +50,15 @@ class RangeValue {
   bool Supported(void) const { return (min_ != max_); }
 };
 
+//enum PREVIEW_INDICES {
+//  PREVIEW_REQUEST_IDX = 0,
+//  JPG_CAPTURE_REQUEST_IDX,
+//  CAPTURE_REQUEST_COUNT,
+//};
+
 enum PREVIEW_INDICES {
-  PREVIEW_REQUEST_IDX = 0,
-  JPG_CAPTURE_REQUEST_IDX,
-  CAPTURE_REQUEST_COUNT,
+    JPG_CAPTURE_REQUEST_IDX = 0,
+    CAPTURE_REQUEST_COUNT,
 };
 
 struct CaptureRequestInfo {

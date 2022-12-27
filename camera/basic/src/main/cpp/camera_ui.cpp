@@ -24,24 +24,24 @@
  *
  * @return current rotation angle
  */
-int CameraEngine::GetDisplayRotation() {
-  ASSERT(app_, "Application is not initialized");
-
-  JNIEnv *env;
-  ANativeActivity *activity = app_->activity;
-  activity->vm->GetEnv((void **)&env, JNI_VERSION_1_6);
-
-  activity->vm->AttachCurrentThread(&env, NULL);
-
-  jobject activityObj = env->NewGlobalRef(activity->clazz);
-  jclass clz = env->GetObjectClass(activityObj);
-  jint newOrientation = env->CallIntMethod(
-      activityObj, env->GetMethodID(clz, "getRotationDegree", "()I"));
-  env->DeleteGlobalRef(activityObj);
-
-  activity->vm->DetachCurrentThread();
-  return newOrientation;
-}
+//int CameraEngine::GetDisplayRotation() {
+//  ASSERT(app_, "Application is not initialized");
+//
+//  JNIEnv *env;
+//  ANativeActivity *activity = app_->activity;
+//  activity->vm->GetEnv((void **)&env, JNI_VERSION_1_6);
+//
+//  activity->vm->AttachCurrentThread(&env, NULL);
+//
+//  jobject activityObj = env->NewGlobalRef(activity->clazz);
+//  jclass clz = env->GetObjectClass(activityObj);
+//  jint newOrientation = env->CallIntMethod(
+//      activityObj, env->GetMethodID(clz, "getRotationDegree", "()I"));
+//  env->DeleteGlobalRef(activityObj);
+//
+//  activity->vm->DetachCurrentThread();
+//  return newOrientation;
+//}
 
 /**
  * Initializate UI on Java side. The 2 seekBars' values are passed in
@@ -67,15 +67,15 @@ void CameraEngine::EnableUI(void) {
   ASSERT(initData && methodID, "JavaUI interface Object failed(%p, %p)",
          methodID, initData);
 
-  if (!camera_->GetExposureRange(&range[0], &range[1], &range[2])) {
-    memset(range, 0, sizeof(int64_t) * 3);
-  }
-
-  jni->SetLongArrayRegion(initData, 0, 3, range);
-
-  if (!camera_->GetSensitivityRange(&range[0], &range[1], &range[2])) {
-    memset(range, 0, sizeof(int64_t) * 3);
-  }
+//  if (!camera_->GetExposureRange(&range[0], &range[1], &range[2])) {
+//    memset(range, 0, sizeof(int64_t) * 3);
+//  }
+//
+//  jni->SetLongArrayRegion(initData, 0, 3, range);
+//
+//  if (!camera_->GetSensitivityRange(&range[0], &range[1], &range[2])) {
+//    memset(range, 0, sizeof(int64_t) * 3);
+//  }
   jni->SetLongArrayRegion(initData, 3, 3, range);
   jni->CallVoidMethod(app_->activity->clazz, methodID, initData);
   app_->activity->vm->DetachCurrentThread();
@@ -141,16 +141,16 @@ Java_com_sample_camera_basic_CameraActivity_TakePhoto(JNIEnv *env,
   takePhotoHandler.detach();
 }
 
-extern "C" JNIEXPORT void JNICALL
-Java_com_sample_camera_basic_CameraActivity_OnExposureChanged(
-    JNIEnv *env, jobject instance, jlong exposurePercent) {
-  GetAppEngine()->OnCameraParameterChanged(ACAMERA_SENSOR_EXPOSURE_TIME,
-                                           exposurePercent);
-}
+//extern "C" JNIEXPORT void JNICALL
+//Java_com_sample_camera_basic_CameraActivity_OnExposureChanged(
+//    JNIEnv *env, jobject instance, jlong exposurePercent) {
+//  GetAppEngine()->OnCameraParameterChanged(ACAMERA_SENSOR_EXPOSURE_TIME,
+//                                           exposurePercent);
+//}
 
-extern "C" JNIEXPORT void JNICALL
-Java_com_sample_camera_basic_CameraActivity_OnSensitivityChanged(
-    JNIEnv *env, jobject instance, jlong sensitivity) {
-  GetAppEngine()->OnCameraParameterChanged(ACAMERA_SENSOR_SENSITIVITY,
-                                           sensitivity);
-}
+//extern "C" JNIEXPORT void JNICALL
+//Java_com_sample_camera_basic_CameraActivity_OnSensitivityChanged(
+//    JNIEnv *env, jobject instance, jlong sensitivity) {
+//  GetAppEngine()->OnCameraParameterChanged(ACAMERA_SENSOR_SENSITIVITY,
+//                                           sensitivity);
+//}

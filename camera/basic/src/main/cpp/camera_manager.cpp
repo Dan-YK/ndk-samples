@@ -31,8 +31,8 @@
  *     on camera. For this sample purpose, clamp to a range showing visible
  *     video on preview: 100000ns ~ 250000000ns
  */
-static const uint64_t kMinExposureTime = static_cast<uint64_t>(1000000);
-static const uint64_t kMaxExposureTime = static_cast<uint64_t>(250000000);
+//static const uint64_t kMinExposureTime = static_cast<uint64_t>(1000000);
+//static const uint64_t kMaxExposureTime = static_cast<uint64_t>(250000000);
 
 NDKCamera::NDKCamera()
     : cameraMgr_(nullptr),
@@ -61,42 +61,42 @@ NDKCamera::NDKCamera()
 
   // Initialize camera controls(exposure time and sensitivity), pick
   // up value of 2% * range + min as starting value (just a number, no magic)
-  ACameraMetadata* metadataObj;
-  CALL_MGR(getCameraCharacteristics(cameraMgr_, activeCameraId_.c_str(),
-                                    &metadataObj));
-  ACameraMetadata_const_entry val = {
-      0,
-  };
-  camera_status_t status = ACameraMetadata_getConstEntry(
-      metadataObj, ACAMERA_SENSOR_INFO_EXPOSURE_TIME_RANGE, &val);
-  if (status == ACAMERA_OK) {
-    exposureRange_.min_ = val.data.i64[0];
-    if (exposureRange_.min_ < kMinExposureTime) {
-      exposureRange_.min_ = kMinExposureTime;
-    }
-    exposureRange_.max_ = val.data.i64[1];
-    if (exposureRange_.max_ > kMaxExposureTime) {
-      exposureRange_.max_ = kMaxExposureTime;
-    }
-    exposureTime_ = exposureRange_.value(2);
-  } else {
-    LOGW("Unsupported ACAMERA_SENSOR_INFO_EXPOSURE_TIME_RANGE");
-    exposureRange_.min_ = exposureRange_.max_ = 0l;
-    exposureTime_ = 0l;
-  }
-  status = ACameraMetadata_getConstEntry(
-      metadataObj, ACAMERA_SENSOR_INFO_SENSITIVITY_RANGE, &val);
-
-  if (status == ACAMERA_OK) {
-    sensitivityRange_.min_ = val.data.i32[0];
-    sensitivityRange_.max_ = val.data.i32[1];
-
-    sensitivity_ = sensitivityRange_.value(2);
-  } else {
-    LOGW("failed for ACAMERA_SENSOR_INFO_SENSITIVITY_RANGE");
-    sensitivityRange_.min_ = sensitivityRange_.max_ = 0;
-    sensitivity_ = 0;
-  }
+//  ACameraMetadata* metadataObj;
+//  CALL_MGR(getCameraCharacteristics(cameraMgr_, activeCameraId_.c_str(),
+//                                    &metadataObj));
+//  ACameraMetadata_const_entry val = {
+//      0,
+//  };
+//  camera_status_t status = ACameraMetadata_getConstEntry(
+//      metadataObj, ACAMERA_SENSOR_INFO_EXPOSURE_TIME_RANGE, &val);
+//  if (status == ACAMERA_OK) {
+//    exposureRange_.min_ = val.data.i64[0];
+//    if (exposureRange_.min_ < kMinExposureTime) {
+//      exposureRange_.min_ = kMinExposureTime;
+//    }
+//    exposureRange_.max_ = val.data.i64[1];
+//    if (exposureRange_.max_ > kMaxExposureTime) {
+//      exposureRange_.max_ = kMaxExposureTime;
+//    }
+//    exposureTime_ = exposureRange_.value(2);
+//  } else {
+//    LOGW("Unsupported ACAMERA_SENSOR_INFO_EXPOSURE_TIME_RANGE");
+//    exposureRange_.min_ = exposureRange_.max_ = 0l;
+//    exposureTime_ = 0l;
+//  }
+//  status = ACameraMetadata_getConstEntry(
+//      metadataObj, ACAMERA_SENSOR_INFO_SENSITIVITY_RANGE, &val);
+//
+//  if (status == ACAMERA_OK) {
+//    sensitivityRange_.min_ = val.data.i32[0];
+//    sensitivityRange_.max_ = val.data.i32[1];
+//
+//    sensitivity_ = sensitivityRange_.value(2);
+//  } else {
+//    LOGW("failed for ACAMERA_SENSOR_INFO_SENSITIVITY_RANGE");
+//    sensitivityRange_.min_ = sensitivityRange_.max_ = 0;
+//    sensitivity_ = 0;
+//  }
   valid_ = true;
 }
 
@@ -227,8 +227,8 @@ bool NDKCamera::MatchCaptureSizeRequest(ANativeWindow* display,
 void NDKCamera::CreateSession(ANativeWindow* previewWindow,
                               ANativeWindow* jpgWindow, int32_t imageRotation) {
   // Create output from this app's ANativeWindow, and add into output container
-  requests_[PREVIEW_REQUEST_IDX].outputNativeWindow_ = previewWindow;
-  requests_[PREVIEW_REQUEST_IDX].template_ = TEMPLATE_PREVIEW;
+//  requests_[PREVIEW_REQUEST_IDX].outputNativeWindow_ = previewWindow;
+//  requests_[PREVIEW_REQUEST_IDX].template_ = TEMPLATE_PREVIEW;
   requests_[JPG_CAPTURE_REQUEST_IDX].outputNativeWindow_ = jpgWindow;
   requests_[JPG_CAPTURE_REQUEST_IDX].template_ = TEMPLATE_STILL_CAPTURE;
 
@@ -258,13 +258,13 @@ void NDKCamera::CreateSession(ANativeWindow* previewWindow,
    * the capture parameters, this sample leaves JPG capture to be auto mode
    * (auto control has better effect than author's manual control)
    */
-  uint8_t aeModeOff = ACAMERA_CONTROL_AE_MODE_OFF;
-  CALL_REQUEST(setEntry_u8(requests_[PREVIEW_REQUEST_IDX].request_,
-                           ACAMERA_CONTROL_AE_MODE, 1, &aeModeOff));
-  CALL_REQUEST(setEntry_i32(requests_[PREVIEW_REQUEST_IDX].request_,
-                            ACAMERA_SENSOR_SENSITIVITY, 1, &sensitivity_));
-  CALL_REQUEST(setEntry_i64(requests_[PREVIEW_REQUEST_IDX].request_,
-                            ACAMERA_SENSOR_EXPOSURE_TIME, 1, &exposureTime_));
+//  uint8_t aeModeOff = ACAMERA_CONTROL_AE_MODE_OFF;
+//  CALL_REQUEST(setEntry_u8(requests_[PREVIEW_REQUEST_IDX].request_,
+//                           ACAMERA_CONTROL_AE_MODE, 1, &aeModeOff));
+//  CALL_REQUEST(setEntry_i32(requests_[PREVIEW_REQUEST_IDX].request_,
+//                            ACAMERA_SENSOR_SENSITIVITY, 1, &sensitivity_));
+//  CALL_REQUEST(setEntry_i64(requests_[PREVIEW_REQUEST_IDX].request_,
+//                            ACAMERA_SENSOR_EXPOSURE_TIME, 1, &exposureTime_));
 }
 
 NDKCamera::~NDKCamera() {
@@ -385,18 +385,18 @@ bool NDKCamera::GetSensorOrientation(int32_t* facing, int32_t* angle) {
  * StartPreview()
  *   Toggle preview start/stop
  */
-void NDKCamera::StartPreview(bool start) {
-  if (start) {
-    CALL_SESSION(setRepeatingRequest(captureSession_, nullptr, 1,
-                                     &requests_[PREVIEW_REQUEST_IDX].request_,
-                                     nullptr));
-  } else if (!start && captureSessionState_ == CaptureSessionState::ACTIVE) {
-    ACameraCaptureSession_stopRepeating(captureSession_);
-  } else {
-    ASSERT(false, "Conflict states(%s, %d)", (start ? "true" : "false"),
-           captureSessionState_);
-  }
-}
+//void NDKCamera::StartPreview(bool start) {
+//  if (start) {
+//    CALL_SESSION(setRepeatingRequest(captureSession_, nullptr, 1,
+//                                     &requests_[PREVIEW_REQUEST_IDX].request_,
+//                                     nullptr));
+//  } else if (!start && captureSessionState_ == CaptureSessionState::ACTIVE) {
+//    ACameraCaptureSession_stopRepeating(captureSession_);
+//  } else {
+//    ASSERT(false, "Conflict states(%s, %d)", (start ? "true" : "false"),
+//           captureSessionState_);
+//  }
+//}
 
 /**
  * Capture one jpg photo into
@@ -414,36 +414,36 @@ bool NDKCamera::TakePhoto(void) {
   return true;
 }
 
-void NDKCamera::UpdateCameraRequestParameter(int32_t code, int64_t val) {
-  ACaptureRequest* request = requests_[PREVIEW_REQUEST_IDX].request_;
-  switch (code) {
-    case ACAMERA_SENSOR_EXPOSURE_TIME:
-      if (exposureRange_.Supported()) {
-        exposureTime_ = val;
-        CALL_REQUEST(setEntry_i64(request, ACAMERA_SENSOR_EXPOSURE_TIME, 1,
-                                  &exposureTime_));
-      }
-      break;
-
-    case ACAMERA_SENSOR_SENSITIVITY:
-      if (sensitivityRange_.Supported()) {
-        sensitivity_ = val;
-        CALL_REQUEST(setEntry_i32(request, ACAMERA_SENSOR_SENSITIVITY, 1,
-                                  &sensitivity_));
-      }
-      break;
-    default:
-      ASSERT(false, "==ERROR==: error code for CameraParameterChange: %d",
-             code);
-      return;
-  }
-
-  uint8_t aeModeOff = ACAMERA_CONTROL_AE_MODE_OFF;
-  CALL_REQUEST(setEntry_u8(request, ACAMERA_CONTROL_AE_MODE, 1, &aeModeOff));
-  CALL_SESSION(
-      setRepeatingRequest(captureSession_, nullptr, 1, &request,
-                          &requests_[PREVIEW_REQUEST_IDX].sessionSequenceId_));
-}
+//void NDKCamera::UpdateCameraRequestParameter(int32_t code, int64_t val) {
+//  ACaptureRequest* request = requests_[PREVIEW_REQUEST_IDX].request_;
+//  switch (code) {
+//    case ACAMERA_SENSOR_EXPOSURE_TIME:
+//      if (exposureRange_.Supported()) {
+//        exposureTime_ = val;
+//        CALL_REQUEST(setEntry_i64(request, ACAMERA_SENSOR_EXPOSURE_TIME, 1,
+//                                  &exposureTime_));
+//      }
+//      break;
+//
+//    case ACAMERA_SENSOR_SENSITIVITY:
+//      if (sensitivityRange_.Supported()) {
+//        sensitivity_ = val;
+//        CALL_REQUEST(setEntry_i32(request, ACAMERA_SENSOR_SENSITIVITY, 1,
+//                                  &sensitivity_));
+//      }
+//      break;
+//    default:
+//      ASSERT(false, "==ERROR==: error code for CameraParameterChange: %d",
+//             code);
+//      return;
+//  }
+//
+//  uint8_t aeModeOff = ACAMERA_CONTROL_AE_MODE_OFF;
+//  CALL_REQUEST(setEntry_u8(request, ACAMERA_CONTROL_AE_MODE, 1, &aeModeOff));
+//  CALL_SESSION(
+//      setRepeatingRequest(captureSession_, nullptr, 1, &request,
+//                          &requests_[PREVIEW_REQUEST_IDX].sessionSequenceId_));
+//}
 
 /**
  * Retrieve Camera Exposure adjustable range.
@@ -454,17 +454,17 @@ void NDKCamera::UpdateCameraRequestParameter(int32_t code, int64_t val) {
  * @return true  min and max are loaded with the camera's exposure values
  *         false camera has not initialized, no value available
  */
-bool NDKCamera::GetExposureRange(int64_t* min, int64_t* max, int64_t* curVal) {
-  if (!exposureRange_.Supported() || !exposureTime_ || !min || !max ||
-      !curVal) {
-    return false;
-  }
-  *min = exposureRange_.min_;
-  *max = exposureRange_.max_;
-  *curVal = exposureTime_;
-
-  return true;
-}
+//bool NDKCamera::GetExposureRange(int64_t* min, int64_t* max, int64_t* curVal) {
+//  if (!exposureRange_.Supported() || !exposureTime_ || !min || !max ||
+//      !curVal) {
+//    return false;
+//  }
+//  *min = exposureRange_.min_;
+//  *max = exposureRange_.max_;
+//  *curVal = exposureTime_;
+//
+//  return true;
+//}
 
 /**
  * Retrieve Camera sensitivity range.
@@ -475,14 +475,14 @@ bool NDKCamera::GetExposureRange(int64_t* min, int64_t* max, int64_t* curVal) {
  * @return true  min and max are loaded with the camera's sensitivity values
  *         false camera has not initialized, no value available
  */
-bool NDKCamera::GetSensitivityRange(int64_t* min, int64_t* max,
-                                    int64_t* curVal) {
-  if (!sensitivityRange_.Supported() || !sensitivity_ || !min || !max ||
-      !curVal) {
-    return false;
-  }
-  *min = static_cast<int64_t>(sensitivityRange_.min_);
-  *max = static_cast<int64_t>(sensitivityRange_.max_);
-  *curVal = sensitivity_;
-  return true;
-}
+//bool NDKCamera::GetSensitivityRange(int64_t* min, int64_t* max,
+//                                    int64_t* curVal) {
+//  if (!sensitivityRange_.Supported() || !sensitivity_ || !min || !max ||
+//      !curVal) {
+//    return false;
+//  }
+//  *min = static_cast<int64_t>(sensitivityRange_.min_);
+//  *max = static_cast<int64_t>(sensitivityRange_.max_);
+//  *curVal = sensitivity_;
+//  return true;
+//}

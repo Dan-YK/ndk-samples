@@ -218,7 +218,7 @@ void NDKCamera::OnCaptureFailed(ACameraCaptureSession* session,
     ASSERT(failure->sequenceId ==
                requests_[JPG_CAPTURE_REQUEST_IDX].sessionSequenceId_,
            "Error jpg sequence id")
-    StartPreview(true);
+//    StartPreview(true);
   }
 }
 
@@ -235,7 +235,7 @@ void NDKCamera::OnCaptureSequenceEnd(ACameraCaptureSession* session,
     return;
 
   // resume preview
-  CALL_SESSION(setRepeatingRequest(captureSession_, nullptr, 1,
-                                   &requests_[PREVIEW_REQUEST_IDX].request_,
-                                   nullptr));
+//  CALL_SESSION(setRepeatingRequest(captureSession_, nullptr, 1,
+//                                   &requests_[PREVIEW_REQUEST_IDX].request_,
+//                                   nullptr));
 }

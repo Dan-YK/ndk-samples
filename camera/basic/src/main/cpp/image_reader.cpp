@@ -62,7 +62,10 @@ ImageReader::ImageReader(ImageFormat *res, enum AIMAGE_FORMATS format)
   callback_ = nullptr;
   callbackCtx_ = nullptr;
 
-  media_status_t status = AImageReader_new(res->width, res->height, format,
+//  media_status_t status = AImageReader_new(res->width, res->height, format,
+//                                           MAX_BUF_COUNT, &reader_);
+
+  media_status_t status = AImageReader_new(480, 640, format,
                                            MAX_BUF_COUNT, &reader_);
   ASSERT(reader_ && status == AMEDIA_OK, "Failed to create AImageReader");
 
@@ -168,34 +171,34 @@ void ImageReader::DeleteImage(AImage *image) {
 // This value is 2 ^ 18 - 1, and is used to clamp the RGB values before their
 // ranges
 // are normalized to eight bits.
-static const int kMaxChannelValue = 262143;
-
-static inline uint32_t YUV2RGB(int nY, int nU, int nV) {
-  nY -= 16;
-  nU -= 128;
-  nV -= 128;
-  if (nY < 0) nY = 0;
-
-  // This is the floating point equivalent. We do the conversion in integer
-  // because some Android devices do not have floating point in hardware.
-  // nR = (int)(1.164 * nY + 1.596 * nV);
-  // nG = (int)(1.164 * nY - 0.813 * nV - 0.391 * nU);
-  // nB = (int)(1.164 * nY + 2.018 * nU);
-
-  int nR = (int)(1192 * nY + 1634 * nV);
-  int nG = (int)(1192 * nY - 833 * nV - 400 * nU);
-  int nB = (int)(1192 * nY + 2066 * nU);
-
-  nR = MIN(kMaxChannelValue, MAX(0, nR));
-  nG = MIN(kMaxChannelValue, MAX(0, nG));
-  nB = MIN(kMaxChannelValue, MAX(0, nB));
-
-  nR = (nR >> 10) & 0xff;
-  nG = (nG >> 10) & 0xff;
-  nB = (nB >> 10) & 0xff;
-
-  return 0xff000000 | (nR << 16) | (nG << 8) | nB;
-}
+//static const int kMaxChannelValue = 262143;
+//
+//static inline uint32_t YUV2RGB(int nY, int nU, int nV) {
+//  nY -= 16;
+//  nU -= 128;
+//  nV -= 128;
+//  if (nY < 0) nY = 0;
+//
+//  // This is the floating point equivalent. We do the conversion in integer
+//  // because some Android devices do not have floating point in hardware.
+//  // nR = (int)(1.164 * nY + 1.596 * nV);
+//  // nG = (int)(1.164 * nY - 0.813 * nV - 0.391 * nU);
+//  // nB = (int)(1.164 * nY + 2.018 * nU);
+//
+//  int nR = (int)(1192 * nY + 1634 * nV);
+//  int nG = (int)(1192 * nY - 833 * nV - 400 * nU);
+//  int nB = (int)(1192 * nY + 2066 * nU);
+//
+//  nR = MIN(kMaxChannelValue, MAX(0, nR));
+//  nG = MIN(kMaxChannelValue, MAX(0, nG));
+//  nB = MIN(kMaxChannelValue, MAX(0, nB));
+//
+//  nR = (nR >> 10) & 0xff;
+//  nG = (nG >> 10) & 0xff;
+//  nB = (nB >> 10) & 0xff;
+//
+//  return 0xff000000 | (nR << 16) | (nG << 8) | nB;
+//}
 
 /**
  * Convert yuv image inside AImage into ANativeWindow_Buffer
@@ -207,39 +210,39 @@ static inline uint32_t YUV2RGB(int nY, int nU, int nV) {
  * @param image a {@link AImage} instance, source of image conversion.
  *            it will be deleted via {@link AImage_delete}
  */
-bool ImageReader::DisplayImage(ANativeWindow_Buffer *buf, AImage *image) {
-  ASSERT(buf->format == WINDOW_FORMAT_RGBX_8888 ||
-             buf->format == WINDOW_FORMAT_RGBA_8888,
-         "Not supported buffer format");
-
-  int32_t srcFormat = -1;
-  AImage_getFormat(image, &srcFormat);
-  ASSERT(AIMAGE_FORMAT_YUV_420_888 == srcFormat, "Failed to get format");
-  int32_t srcPlanes = 0;
-  AImage_getNumberOfPlanes(image, &srcPlanes);
-  ASSERT(srcPlanes == 3, "Is not 3 planes");
-
-  switch (presentRotation_) {
-    case 0:
-      PresentImage(buf, image);
-      break;
-    case 90:
-      PresentImage90(buf, image);
-      break;
-    case 180:
-      PresentImage180(buf, image);
-      break;
-    case 270:
-      PresentImage270(buf, image);
-      break;
-    default:
-      ASSERT(0, "NOT recognized display rotation: %d", presentRotation_);
-  }
-
-  AImage_delete(image);
-
-  return true;
-}
+//bool ImageReader::DisplayImage(ANativeWindow_Buffer *buf, AImage *image) {
+//  ASSERT(buf->format == WINDOW_FORMAT_RGBX_8888 ||
+//             buf->format == WINDOW_FORMAT_RGBA_8888,
+//         "Not supported buffer format");
+//
+//  int32_t srcFormat = -1;
+//  AImage_getFormat(image, &srcFormat);
+//  ASSERT(AIMAGE_FORMAT_YUV_420_888 == srcFormat, "Failed to get format");
+//  int32_t srcPlanes = 0;
+//  AImage_getNumberOfPlanes(image, &srcPlanes);
+//  ASSERT(srcPlanes == 3, "Is not 3 planes");
+//
+//  switch (presentRotation_) {
+//    case 0:
+//      PresentImage(buf, image);
+//      break;
+//    case 90:
+//      PresentImage90(buf, image);
+//      break;
+//    case 180:
+//      PresentImage180(buf, image);
+//      break;
+//    case 270:
+//      PresentImage270(buf, image);
+//      break;
+//    default:
+//      ASSERT(0, "NOT recognized display rotation: %d", presentRotation_);
+//  }
+//
+//  AImage_delete(image);
+//
+//  return true;
+//}
 
 /*
  * PresentImage()
@@ -248,165 +251,165 @@ bool ImageReader::DisplayImage(ANativeWindow_Buffer *buf, AImage *image) {
  *   Refer to:
  * https://mathbits.com/MathBits/TISection/Geometry/Transformations2.htm
  */
-void ImageReader::PresentImage(ANativeWindow_Buffer *buf, AImage *image) {
-  AImageCropRect srcRect;
-  AImage_getCropRect(image, &srcRect);
-
-  int32_t yStride, uvStride;
-  uint8_t *yPixel, *uPixel, *vPixel;
-  int32_t yLen, uLen, vLen;
-  AImage_getPlaneRowStride(image, 0, &yStride);
-  AImage_getPlaneRowStride(image, 1, &uvStride);
-  AImage_getPlaneData(image, 0, &yPixel, &yLen);
-  AImage_getPlaneData(image, 1, &vPixel, &vLen);
-  AImage_getPlaneData(image, 2, &uPixel, &uLen);
-  int32_t uvPixelStride;
-  AImage_getPlanePixelStride(image, 1, &uvPixelStride);
-
-  int32_t height = MIN(buf->height, (srcRect.bottom - srcRect.top));
-  int32_t width = MIN(buf->width, (srcRect.right - srcRect.left));
-
-  uint32_t *out = static_cast<uint32_t *>(buf->bits);
-  for (int32_t y = 0; y < height; y++) {
-    const uint8_t *pY = yPixel + yStride * (y + srcRect.top) + srcRect.left;
-
-    int32_t uv_row_start = uvStride * ((y + srcRect.top) >> 1);
-    const uint8_t *pU = uPixel + uv_row_start + (srcRect.left >> 1);
-    const uint8_t *pV = vPixel + uv_row_start + (srcRect.left >> 1);
-
-    for (int32_t x = 0; x < width; x++) {
-      const int32_t uv_offset = (x >> 1) * uvPixelStride;
-      out[x] = YUV2RGB(pY[x], pU[uv_offset], pV[uv_offset]);
-    }
-    out += buf->stride;
-  }
-}
+//void ImageReader::PresentImage(ANativeWindow_Buffer *buf, AImage *image) {
+//  AImageCropRect srcRect;
+//  AImage_getCropRect(image, &srcRect);
+//
+//  int32_t yStride, uvStride;
+//  uint8_t *yPixel, *uPixel, *vPixel;
+//  int32_t yLen, uLen, vLen;
+//  AImage_getPlaneRowStride(image, 0, &yStride);
+//  AImage_getPlaneRowStride(image, 1, &uvStride);
+//  AImage_getPlaneData(image, 0, &yPixel, &yLen);
+//  AImage_getPlaneData(image, 1, &vPixel, &vLen);
+//  AImage_getPlaneData(image, 2, &uPixel, &uLen);
+//  int32_t uvPixelStride;
+//  AImage_getPlanePixelStride(image, 1, &uvPixelStride);
+//
+//  int32_t height = MIN(buf->height, (srcRect.bottom - srcRect.top));
+//  int32_t width = MIN(buf->width, (srcRect.right - srcRect.left));
+//
+//  uint32_t *out = static_cast<uint32_t *>(buf->bits);
+//  for (int32_t y = 0; y < height; y++) {
+//    const uint8_t *pY = yPixel + yStride * (y + srcRect.top) + srcRect.left;
+//
+//    int32_t uv_row_start = uvStride * ((y + srcRect.top) >> 1);
+//    const uint8_t *pU = uPixel + uv_row_start + (srcRect.left >> 1);
+//    const uint8_t *pV = vPixel + uv_row_start + (srcRect.left >> 1);
+//
+//    for (int32_t x = 0; x < width; x++) {
+//      const int32_t uv_offset = (x >> 1) * uvPixelStride;
+//      out[x] = YUV2RGB(pY[x], pU[uv_offset], pV[uv_offset]);
+//    }
+//    out += buf->stride;
+//  }
+//}
 
 /*
  * PresentImage90()
  *   Converting YUV to RGB
  *   Rotation image anti-clockwise 90 degree -- (x, y) --> (-y, x)
- */
-void ImageReader::PresentImage90(ANativeWindow_Buffer *buf, AImage *image) {
-  AImageCropRect srcRect;
-  AImage_getCropRect(image, &srcRect);
-
-  int32_t yStride, uvStride;
-  uint8_t *yPixel, *uPixel, *vPixel;
-  int32_t yLen, uLen, vLen;
-  AImage_getPlaneRowStride(image, 0, &yStride);
-  AImage_getPlaneRowStride(image, 1, &uvStride);
-  AImage_getPlaneData(image, 0, &yPixel, &yLen);
-  AImage_getPlaneData(image, 1, &vPixel, &vLen);
-  AImage_getPlaneData(image, 2, &uPixel, &uLen);
-  int32_t uvPixelStride;
-  AImage_getPlanePixelStride(image, 1, &uvPixelStride);
-
-  int32_t height = MIN(buf->width, (srcRect.bottom - srcRect.top));
-  int32_t width = MIN(buf->height, (srcRect.right - srcRect.left));
-
-  uint32_t *out = static_cast<uint32_t *>(buf->bits);
-  out += height - 1;
-  for (int32_t y = 0; y < height; y++) {
-    const uint8_t *pY = yPixel + yStride * (y + srcRect.top) + srcRect.left;
-
-    int32_t uv_row_start = uvStride * ((y + srcRect.top) >> 1);
-    const uint8_t *pU = uPixel + uv_row_start + (srcRect.left >> 1);
-    const uint8_t *pV = vPixel + uv_row_start + (srcRect.left >> 1);
-
-    for (int32_t x = 0; x < width; x++) {
-      const int32_t uv_offset = (x >> 1) * uvPixelStride;
-      // [x, y]--> [-y, x]
-      out[x * buf->stride] = YUV2RGB(pY[x], pU[uv_offset], pV[uv_offset]);
-    }
-    out -= 1;  // move to the next column
-  }
-}
+// */
+//void ImageReader::PresentImage90(ANativeWindow_Buffer *buf, AImage *image) {
+//  AImageCropRect srcRect;
+//  AImage_getCropRect(image, &srcRect);
+//
+//  int32_t yStride, uvStride;
+//  uint8_t *yPixel, *uPixel, *vPixel;
+//  int32_t yLen, uLen, vLen;
+//  AImage_getPlaneRowStride(image, 0, &yStride);
+//  AImage_getPlaneRowStride(image, 1, &uvStride);
+//  AImage_getPlaneData(image, 0, &yPixel, &yLen);
+//  AImage_getPlaneData(image, 1, &vPixel, &vLen);
+//  AImage_getPlaneData(image, 2, &uPixel, &uLen);
+//  int32_t uvPixelStride;
+//  AImage_getPlanePixelStride(image, 1, &uvPixelStride);
+//
+//  int32_t height = MIN(buf->width, (srcRect.bottom - srcRect.top));
+//  int32_t width = MIN(buf->height, (srcRect.right - srcRect.left));
+//
+//  uint32_t *out = static_cast<uint32_t *>(buf->bits);
+//  out += height - 1;
+//  for (int32_t y = 0; y < height; y++) {
+//    const uint8_t *pY = yPixel + yStride * (y + srcRect.top) + srcRect.left;
+//
+//    int32_t uv_row_start = uvStride * ((y + srcRect.top) >> 1);
+//    const uint8_t *pU = uPixel + uv_row_start + (srcRect.left >> 1);
+//    const uint8_t *pV = vPixel + uv_row_start + (srcRect.left >> 1);
+//
+//    for (int32_t x = 0; x < width; x++) {
+//      const int32_t uv_offset = (x >> 1) * uvPixelStride;
+//      // [x, y]--> [-y, x]
+//      out[x * buf->stride] = YUV2RGB(pY[x], pU[uv_offset], pV[uv_offset]);
+//    }
+//    out -= 1;  // move to the next column
+//  }
+//}
 
 /*
  * PresentImage180()
  *   Converting yuv to RGB
  *   Rotate image 180 degree: (x, y) --> (-x, -y)
  */
-void ImageReader::PresentImage180(ANativeWindow_Buffer *buf, AImage *image) {
-  AImageCropRect srcRect;
-  AImage_getCropRect(image, &srcRect);
-
-  int32_t yStride, uvStride;
-  uint8_t *yPixel, *uPixel, *vPixel;
-  int32_t yLen, uLen, vLen;
-  AImage_getPlaneRowStride(image, 0, &yStride);
-  AImage_getPlaneRowStride(image, 1, &uvStride);
-  AImage_getPlaneData(image, 0, &yPixel, &yLen);
-  AImage_getPlaneData(image, 1, &vPixel, &vLen);
-  AImage_getPlaneData(image, 2, &uPixel, &uLen);
-  int32_t uvPixelStride;
-  AImage_getPlanePixelStride(image, 1, &uvPixelStride);
-
-  int32_t height = MIN(buf->height, (srcRect.bottom - srcRect.top));
-  int32_t width = MIN(buf->width, (srcRect.right - srcRect.left));
-
-  uint32_t *out = static_cast<uint32_t *>(buf->bits);
-  out += (height - 1) * buf->stride;
-  for (int32_t y = 0; y < height; y++) {
-    const uint8_t *pY = yPixel + yStride * (y + srcRect.top) + srcRect.left;
-
-    int32_t uv_row_start = uvStride * ((y + srcRect.top) >> 1);
-    const uint8_t *pU = uPixel + uv_row_start + (srcRect.left >> 1);
-    const uint8_t *pV = vPixel + uv_row_start + (srcRect.left >> 1);
-
-    for (int32_t x = 0; x < width; x++) {
-      const int32_t uv_offset = (x >> 1) * uvPixelStride;
-      // mirror image since we are using front camera
-      out[width - 1 - x] = YUV2RGB(pY[x], pU[uv_offset], pV[uv_offset]);
-      // out[x] = YUV2RGB(pY[x], pU[uv_offset], pV[uv_offset]);
-    }
-    out -= buf->stride;
-  }
-}
+//void ImageReader::PresentImage180(ANativeWindow_Buffer *buf, AImage *image) {
+//  AImageCropRect srcRect;
+//  AImage_getCropRect(image, &srcRect);
+//
+//  int32_t yStride, uvStride;
+//  uint8_t *yPixel, *uPixel, *vPixel;
+//  int32_t yLen, uLen, vLen;
+//  AImage_getPlaneRowStride(image, 0, &yStride);
+//  AImage_getPlaneRowStride(image, 1, &uvStride);
+//  AImage_getPlaneData(image, 0, &yPixel, &yLen);
+//  AImage_getPlaneData(image, 1, &vPixel, &vLen);
+//  AImage_getPlaneData(image, 2, &uPixel, &uLen);
+//  int32_t uvPixelStride;
+//  AImage_getPlanePixelStride(image, 1, &uvPixelStride);
+//
+//  int32_t height = MIN(buf->height, (srcRect.bottom - srcRect.top));
+//  int32_t width = MIN(buf->width, (srcRect.right - srcRect.left));
+//
+//  uint32_t *out = static_cast<uint32_t *>(buf->bits);
+//  out += (height - 1) * buf->stride;
+//  for (int32_t y = 0; y < height; y++) {
+//    const uint8_t *pY = yPixel + yStride * (y + srcRect.top) + srcRect.left;
+//
+//    int32_t uv_row_start = uvStride * ((y + srcRect.top) >> 1);
+//    const uint8_t *pU = uPixel + uv_row_start + (srcRect.left >> 1);
+//    const uint8_t *pV = vPixel + uv_row_start + (srcRect.left >> 1);
+//
+//    for (int32_t x = 0; x < width; x++) {
+//      const int32_t uv_offset = (x >> 1) * uvPixelStride;
+//      // mirror image since we are using front camera
+//      out[width - 1 - x] = YUV2RGB(pY[x], pU[uv_offset], pV[uv_offset]);
+//      // out[x] = YUV2RGB(pY[x], pU[uv_offset], pV[uv_offset]);
+//    }
+//    out -= buf->stride;
+//  }
+//}
 
 /*
  * PresentImage270()
  *   Converting image from YUV to RGB
  *   Rotate Image counter-clockwise 270 degree: (x, y) --> (y, x)
  */
-void ImageReader::PresentImage270(ANativeWindow_Buffer *buf, AImage *image) {
-  AImageCropRect srcRect;
-  AImage_getCropRect(image, &srcRect);
-
-  int32_t yStride, uvStride;
-  uint8_t *yPixel, *uPixel, *vPixel;
-  int32_t yLen, uLen, vLen;
-  AImage_getPlaneRowStride(image, 0, &yStride);
-  AImage_getPlaneRowStride(image, 1, &uvStride);
-  AImage_getPlaneData(image, 0, &yPixel, &yLen);
-  AImage_getPlaneData(image, 1, &vPixel, &vLen);
-  AImage_getPlaneData(image, 2, &uPixel, &uLen);
-  int32_t uvPixelStride;
-  AImage_getPlanePixelStride(image, 1, &uvPixelStride);
-
-  int32_t height = MIN(buf->width, (srcRect.bottom - srcRect.top));
-  int32_t width = MIN(buf->height, (srcRect.right - srcRect.left));
-
-  uint32_t *out = static_cast<uint32_t *>(buf->bits);
-  for (int32_t y = 0; y < height; y++) {
-    const uint8_t *pY = yPixel + yStride * (y + srcRect.top) + srcRect.left;
-
-    int32_t uv_row_start = uvStride * ((y + srcRect.top) >> 1);
-    const uint8_t *pU = uPixel + uv_row_start + (srcRect.left >> 1);
-    const uint8_t *pV = vPixel + uv_row_start + (srcRect.left >> 1);
-
-    for (int32_t x = 0; x < width; x++) {
-      const int32_t uv_offset = (x >> 1) * uvPixelStride;
-      out[(width - 1 - x) * buf->stride] =
-          YUV2RGB(pY[x], pU[uv_offset], pV[uv_offset]);
-    }
-    out += 1;  // move to the next column
-  }
-}
-void ImageReader::SetPresentRotation(int32_t angle) {
-  presentRotation_ = angle;
-}
+//void ImageReader::PresentImage270(ANativeWindow_Buffer *buf, AImage *image) {
+//  AImageCropRect srcRect;
+//  AImage_getCropRect(image, &srcRect);
+//
+//  int32_t yStride, uvStride;
+//  uint8_t *yPixel, *uPixel, *vPixel;
+//  int32_t yLen, uLen, vLen;
+//  AImage_getPlaneRowStride(image, 0, &yStride);
+//  AImage_getPlaneRowStride(image, 1, &uvStride);
+//  AImage_getPlaneData(image, 0, &yPixel, &yLen);
+//  AImage_getPlaneData(image, 1, &vPixel, &vLen);
+//  AImage_getPlaneData(image, 2, &uPixel, &uLen);
+//  int32_t uvPixelStride;
+//  AImage_getPlanePixelStride(image, 1, &uvPixelStride);
+//
+//  int32_t height = MIN(buf->width, (srcRect.bottom - srcRect.top));
+//  int32_t width = MIN(buf->height, (srcRect.right - srcRect.left));
+//
+//  uint32_t *out = static_cast<uint32_t *>(buf->bits);
+//  for (int32_t y = 0; y < height; y++) {
+//    const uint8_t *pY = yPixel + yStride * (y + srcRect.top) + srcRect.left;
+//
+//    int32_t uv_row_start = uvStride * ((y + srcRect.top) >> 1);
+//    const uint8_t *pU = uPixel + uv_row_start + (srcRect.left >> 1);
+//    const uint8_t *pV = vPixel + uv_row_start + (srcRect.left >> 1);
+//
+//    for (int32_t x = 0; x < width; x++) {
+//      const int32_t uv_offset = (x >> 1) * uvPixelStride;
+//      out[(width - 1 - x) * buf->stride] =
+//          YUV2RGB(pY[x], pU[uv_offset], pV[uv_offset]);
+//    }
+//    out += 1;  // move to the next column
+//  }
+//}
+//void ImageReader::SetPresentRotation(int32_t angle) {
+//  presentRotation_ = angle;
+//}
 
 /**
  * Write out jpeg files to kDirName directory

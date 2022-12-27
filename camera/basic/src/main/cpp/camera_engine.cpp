@@ -41,7 +41,7 @@ CameraEngine::CameraEngine(android_app* app)
 }
 
 CameraEngine::~CameraEngine() {
-  cameraReady_ = false;
+//  cameraReady_ = false;
   DeleteCamera();
 }
 
@@ -60,46 +60,49 @@ void CameraEngine::CreateCamera(void) {
     return;
   }
 
-  int32_t displayRotation = GetDisplayRotation();
-  rotation_ = displayRotation;
+//  int32_t displayRotation = GetDisplayRotation();
+//  rotation_ = displayRotation;
 
   camera_ = new NDKCamera();
   ASSERT(camera_, "Failed to Create CameraObject");
 
   int32_t facing = 0, angle = 0, imageRotation = 0;
-  if (camera_->GetSensorOrientation(&facing, &angle)) {
-    if (facing == ACAMERA_LENS_FACING_FRONT) {
-      imageRotation = (angle + rotation_) % 360;
-      imageRotation = (360 - imageRotation) % 360;
-    } else {
-      imageRotation = (angle - rotation_ + 360) % 360;
-    }
-  }
-  LOGI("Phone Rotation: %d, Present Rotation Angle: %d", rotation_,
-       imageRotation);
-  ImageFormat view{0, 0, 0}, capture{0, 0, 0};
-  camera_->MatchCaptureSizeRequest(app_->window, &view, &capture);
+//  if (camera_->GetSensorOrientation(&facing, &angle)) {
+//    if (facing == ACAMERA_LENS_FACING_FRONT) {
+//      imageRotation = (angle + rotation_) % 360;
+//      imageRotation = (360 - imageRotation) % 360;
+//    } else {
+//      imageRotation = (angle - rotation_ + 360) % 360;
+//    }
+//  }
+//  LOGI("Phone Rotation: %d, Present Rotation Angle: %d", rotation_,
+//       imageRotation);
+//  ImageFormat view{0, 0, 0}, capture{0, 0, 0};
+//  camera_->MatchCaptureSizeRequest(app_->window, &view, &capture);
 
-  ASSERT(view.width && view.height, "Could not find supportable resolution");
+//  ASSERT(view.width && view.height, "Could not find supportable resolution");
 
   // Request the necessary nativeWindow to OS
-  bool portraitNativeWindow =
-      (savedNativeWinRes_.width < savedNativeWinRes_.height);
-  ANativeWindow_setBuffersGeometry(
-      app_->window, portraitNativeWindow ? view.height : view.width,
-      portraitNativeWindow ? view.width : view.height, WINDOW_FORMAT_RGBA_8888);
+//  bool portraitNativeWindow =
+//      (savedNativeWinRes_.width < savedNativeWinRes_.height);
+//  ANativeWindow_setBuffersGeometry(
+//      app_->window, portraitNativeWindow ? view.height : view.width,
+//      portraitNativeWindow ? view.width : view.height, WINDOW_FORMAT_RGBA_8888);
 
-  yuvReader_ = new ImageReader(&view, AIMAGE_FORMAT_YUV_420_888);
-  yuvReader_->SetPresentRotation(imageRotation);
-  jpgReader_ = new ImageReader(&capture, AIMAGE_FORMAT_JPEG);
-  jpgReader_->SetPresentRotation(imageRotation);
+//  yuvReader_ = new ImageReader(&view, AIMAGE_FORMAT_YUV_420_888);
+//  yuvReader_->SetPresentRotation(imageRotation);
+//  jpgReader_ = new ImageReader(&capture, AIMAGE_FORMAT_JPEG);
+  jpgReader_ = new ImageReader(nullptr, AIMAGE_FORMAT_JPEG);
+//  jpgReader_->SetPresentRotation(imageRotation);
   jpgReader_->RegisterCallback(
       this, [this](void* ctx, const char* str) -> void {
         reinterpret_cast<CameraEngine*>(ctx)->OnPhotoTaken(str);
       });
 
   // now we could create session
-  camera_->CreateSession(yuvReader_->GetNativeWindow(),
+//  camera_->CreateSession(yuvReader_->GetNativeWindow(),
+//                         jpgReader_->GetNativeWindow(), imageRotation);
+  camera_->CreateSession(nullptr,
                          jpgReader_->GetNativeWindow(), imageRotation);
 }
 
@@ -147,29 +150,29 @@ void CameraEngine::RequestCameraPermission() {
  * @param code ACAMERA_SENSOR_EXPOSURE_TIME or ACAMERA_SENSOR_SENSITIVITY
  * @param val corresponding value from user
  */
-void CameraEngine::OnCameraParameterChanged(int32_t code, int64_t val) {
-  camera_->UpdateCameraRequestParameter(code, val);
-}
+//void CameraEngine::OnCameraParameterChanged(int32_t code, int64_t val) {
+//  camera_->UpdateCameraRequestParameter(code, val);
+//}
 
 /**
  * The main function rendering a frame. In our case, it is yuv to RGBA8888
  * converter
  */
-void CameraEngine::DrawFrame(void) {
-  if (!cameraReady_ || !yuvReader_) return;
-  AImage* image = yuvReader_->GetNextImage();
-  if (!image) {
-    return;
-  }
-
-  ANativeWindow_acquire(app_->window);
-  ANativeWindow_Buffer buf;
-  if (ANativeWindow_lock(app_->window, &buf, nullptr) < 0) {
-    yuvReader_->DeleteImage(image);
-    return;
-  }
-
-  yuvReader_->DisplayImage(&buf, image);
-  ANativeWindow_unlockAndPost(app_->window);
-  ANativeWindow_release(app_->window);
-}
+//void CameraEngine::DrawFrame(void) {
+//  if (!cameraReady_ || !yuvReader_) return;
+//  AImage* image = yuvReader_->GetNextImage();
+//  if (!image) {
+//    return;
+//  }
+//
+//  ANativeWindow_acquire(app_->window);
+//  ANativeWindow_Buffer buf;
+//  if (ANativeWindow_lock(app_->window, &buf, nullptr) < 0) {
+//    yuvReader_->DeleteImage(image);
+//    return;
+//  }
+//
+//  yuvReader_->DisplayImage(&buf, image);
+//  ANativeWindow_unlockAndPost(app_->window);
+//  ANativeWindow_release(app_->window);
+//}
