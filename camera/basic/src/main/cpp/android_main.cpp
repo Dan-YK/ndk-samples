@@ -17,6 +17,9 @@
 #include "camera_engine.h"
 #include "utils/native_debug.h"
 
+int test1 = 0;
+
+
 /*
  * SampleEngine global object
  */
@@ -52,34 +55,41 @@ static void ProcessAndroidCmd(struct android_app* app, int32_t cmd) {
 }
 
 extern "C" void android_main(struct android_app* state) {
-//  CameraEngine engine(state);
-  CameraEngine engine(nullptr);
+  CameraEngine engine(state);
+//  CameraEngine engine(nullptr);
   pEngineObj = &engine;
 
   state->userData = reinterpret_cast<void*>(&engine);
   state->onAppCmd = ProcessAndroidCmd;
 
+  pEngineObj->OnAppInitWindow();
+
+  while(1);
+
+//  while(!test1)
+//    pEngineObj->OnAppInitWindow();
+
   // loop waiting for stuff to do.
-  while (1) {
-    // Read all pending events.
-    int events;
-    struct android_poll_source* source;
-
-    while (ALooper_pollAll(0, NULL, &events, (void**)&source) >= 0) {
-      // Process this event.
-      if (source != NULL) {
-        source->process(state, source);
-      }
-
-      // Check if we are exiting.
-      if (state->destroyRequested != 0) {
-        LOGI("CameraEngine thread destroy requested!");
-        engine.DeleteCamera();
-        pEngineObj = nullptr;
-        return;
-      }
-    }
-  }
+//  while (1) {
+//    // Read all pending events.
+//    int events;
+//    struct android_poll_source* source;
+//
+//    while (ALooper_pollAll(0, NULL, &events, (void**)&source) >= 0) {
+//      // Process this event.
+//      if (source != NULL) {
+//        source->process(state, source);
+//      }
+//
+//      // Check if we are exiting.
+//      if (state->destroyRequested != 0) {
+//        LOGI("CameraEngine thread destroy requested!");
+//        engine.DeleteCamera();
+//        pEngineObj = nullptr;
+//        return;
+//      }
+//    }
+//  }
 }
 
 /**
@@ -88,11 +98,11 @@ extern "C" void android_main(struct android_app* state) {
  *   Create camera object if camera has been granted
  */
 void CameraEngine::OnAppInitWindow(void) {
-  if (!cameraGranted_) {
-    // Not permitted to use camera yet, ask(again) and defer other events
-    RequestCameraPermission();
-    return;
-  }
+//  if (!cameraGranted_) {
+//    // Not permitted to use camera yet, ask(again) and defer other events
+//    RequestCameraPermission();
+//    return;
+//  }
 
   CreateCamera();
   ASSERT(camera_, "CameraCreation Failed");

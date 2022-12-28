@@ -49,6 +49,7 @@ public class CameraActivity extends NativeActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.i(DBG_TAG, "OnCreate()");
+        RequestCamera();
     }
 
     @Override
