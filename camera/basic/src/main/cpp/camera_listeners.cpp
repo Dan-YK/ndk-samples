@@ -218,7 +218,6 @@ void NDKCamera::OnCaptureFailed(ACameraCaptureSession* session,
     ASSERT(failure->sequenceId ==
                requests_[JPG_CAPTURE_REQUEST_IDX].sessionSequenceId_,
            "Error jpg sequence id")
-//    StartPreview(true);
   }
 }
 

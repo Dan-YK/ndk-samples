@@ -35,18 +35,13 @@ static void ProcessAndroidCmd(struct android_app* app, int32_t cmd) {
   CameraEngine* engine = reinterpret_cast<CameraEngine*>(app->userData);
   switch (cmd) {
     case APP_CMD_INIT_WINDOW:
-      if (engine->AndroidApp()->window != NULL) {
-//        engine->SaveNativeWinRes(ANativeWindow_getWidth(app->window),
-//                                 ANativeWindow_getHeight(app->window),
-//                                 ANativeWindow_getFormat(app->window));
-        engine->OnAppInitWindow();
-      }
+//      if (engine->AndroidApp()->window != NULL) {
+//        engine->OnAppInitWindow();
+//      }
+      engine->OnAppInitWindow();
       break;
     case APP_CMD_TERM_WINDOW:
       engine->OnAppTermWindow();
-//      ANativeWindow_setBuffersGeometry(
-//          app->window, engine->GetSavedNativeWinWidth(),
-//          engine->GetSavedNativeWinHeight(), engine->GetSavedNativeWinFormat());
       break;
     case APP_CMD_CONFIG_CHANGED:
       engine->OnAppConfigChange();
@@ -57,7 +52,8 @@ static void ProcessAndroidCmd(struct android_app* app, int32_t cmd) {
 }
 
 extern "C" void android_main(struct android_app* state) {
-  CameraEngine engine(state);
+//  CameraEngine engine(state);
+  CameraEngine engine(nullptr);
   pEngineObj = &engine;
 
   state->userData = reinterpret_cast<void*>(&engine);
@@ -83,7 +79,6 @@ extern "C" void android_main(struct android_app* state) {
         return;
       }
     }
-//    pEngineObj->DrawFrame();
   }
 }
 
@@ -99,23 +94,16 @@ void CameraEngine::OnAppInitWindow(void) {
     return;
   }
 
-//  rotation_ = GetDisplayRotation();
-
   CreateCamera();
   ASSERT(camera_, "CameraCreation Failed");
 
   EnableUI();
-
-  // NativeActivity end is ready to display, start pulling images
-//  cameraReady_ = true;
-//  camera_->StartPreview(true);
 }
 
 /**
  * Handle APP_CMD_TEMR_WINDOW
  */
 void CameraEngine::OnAppTermWindow(void) {
-//  cameraReady_ = false;
   DeleteCamera();
 }
 
@@ -123,48 +111,5 @@ void CameraEngine::OnAppTermWindow(void) {
  * Handle APP_CMD_CONFIG_CHANGED
  */
 void CameraEngine::OnAppConfigChange(void) {
-//  int newRotation = GetDisplayRotation();
 
-//  if (newRotation != rotation_) {
-//    OnAppTermWindow();
-//
-//    rotation_ = newRotation;
-//    OnAppInitWindow();
-//  }
 }
-
-/**
- * Retrieve saved native window width.
- * @return width of native window
- */
-//int32_t CameraEngine::GetSavedNativeWinWidth(void) {
-//  return savedNativeWinRes_.width;
-//}
-
-/**
- * Retrieve saved native window height.
- * @return height of native window
- */
-//int32_t CameraEngine::GetSavedNativeWinHeight(void) {
-//  return savedNativeWinRes_.height;
-//}
-
-/**
- * Retrieve saved native window format
- * @return format of native window
- */
-//int32_t CameraEngine::GetSavedNativeWinFormat(void) {
-//  return savedNativeWinRes_.format;
-//}
-
-/**
- * Save original NativeWindow Resolution
- * @param w width of native window in pixel
- * @param h height of native window in pixel
- * @param format
- */
-//void CameraEngine::SaveNativeWinRes(int32_t w, int32_t h, int32_t format) {
-//  savedNativeWinRes_.width = w;
-//  savedNativeWinRes_.height = h;
-//  savedNativeWinRes_.format = format;
-//}
